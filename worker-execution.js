@@ -1,17 +1,13 @@
 
-import { Worker } from "node:worker_threads"
-import { NUMBER_OF_CALLS, LOAD_SEED } from './config.js' 
+import { Worker } from 'node:worker_threads'
+import { executor } from './executor.js';
 
-// I know I know, duplicated code... I might fix it later :)
-console.log('Worker threads: ')
-console.time('Current total time')
-for(let i = 1; i <= NUMBER_OF_CALLS; i++){
-    console.time(`Process ${i}`)
-    const worker1 = new Worker('./worker', { 
-        workerData: { load: LOAD_SEED } 
+executor((loadSeed, onProcessExit) => {
+    const worker = new Worker('./worker', { 
+        workerData: { load: loadSeed } 
     });
-    worker1.on('exit', () => {
-        console.timeEnd(`Process ${i}`);
-        console.timeLog('Current total time'); 
-    });
-}
+    worker.on('exit', onProcessExit);
+},'Worker threads');
+
+
+
